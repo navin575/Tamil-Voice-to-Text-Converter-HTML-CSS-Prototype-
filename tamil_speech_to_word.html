@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <title>தமிழ் மொழிபெயர்ப்பாளர்</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+            background-image: url('https://thumbs.dreamstime.com/b/inscriptions-tamil-language-carved-stone-walls-brihadeeswarar-temple-thanjavur-tamilnadu-india-ancient-exterior-228443344.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+            overflow-x: hidden;
+            transition: filter 0.5s ease;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: -1;
+        }
+
+        h1 {
+            color: #1a237e;
+            margin-bottom: 10px;
+            font-size: 2.8rem;
+            font-weight: 600;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        p {
+            color: #555;
+            text-align: center;
+            max-width: 600px;
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        #languageToggleContainer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 2;
+        }
+
+        #languageToggleBtn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: #607D8B;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        #languageToggleBtn:hover {
+            background-color: #455A64;
+        }
+
+        .language-selectors {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #startBtn { background-color: #4CAF50; }
+        #stopBtn { background-color: #f44336; }
+        #clearBtn { background-color: #FF9800; }
+        #downloadBtn { background-color: #2196F3; }
+        #copyBtn { background-color: #607D8B; }
+        #historyBtn { background-color: #1a237e; }
+        #readAloudBtn { background-color: #9C27B0; }
+        #downloadPdfBtn { background-color: #f44336; }
+
+        .output-container {
+            width: 90%;
+            max-width: 800px;
+            margin-top: 30px;
+            position: relative;
+            z-index: 1;
+        }
+        #output {
+            border: 2px solid #ddd;
+            padding: 30px;
+            min-height: 180px;
+            width: 100%;
+            text-align: left;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            font-size: 1.1rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            transition: box-shadow 0.5s, border-color 0.5s;
+            cursor: text;
+        }
+        
+        #output:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
+        }
+
+        .listening {
+            border-color: #4CAF50;
+            box-shadow: 0 0 20px #4CAF50;
+            animation: pulse 1.5s infinite ease-out;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px #4CAF50; }
+            50% { box-shadow: 0 0 25px #4CAF50; }
+            100% { box-shadow: 0 0 10px #4CAF50; }
+        }
+
+        #statusMessage {
+            margin-top: 20px;
+            color: #555;
+            font-style: italic;
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        #translatedOutput {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 2px solid #8D6E63;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            display: none;
+        }
+        
+        /* ----- History Sidebar Styling ----- */
+        .sidebar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            transition: background-color 0.5s;
+            z-index: 100;
+        }
+        .sidebar-container.open {
+            background-color: rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
+        }
+
+        #historySidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 100%;
+            background-color: #fefefe;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            transform: translateX(-100%);
+            transition: transform 0.5s ease-in-out;
+            z-index: 101;
+        }
+        #historySidebar.open {
+            transform: translateX(0);
+        }
+        #historySidebar h2 {
+            margin-top: 0;
+            color: #1a237e;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #555;
+            border: none;
+            background: none;
+        }
+        #historyList {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        .history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fff;
+            border: 1px solid #eee;
+            border-left: 5px solid #1a237e;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .history-text {
+            flex-grow: 1;
+            padding-right: 10px;
+            font-size: 0.9rem;
+            color: #333;
+        }
+        .remove-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background-color 0.2s;
+        }
+        .remove-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            button { padding: 12px 20px; font-size: 15px; }
+            #historySidebar { width: 90%; }
+            .history-item { flex-direction: column; align-items: flex-start; }
+            .remove-btn { margin-top: 10px; }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div id="languageToggleContainer">
+        <button id="languageToggleBtn">English</button>
+    </div>
+
+    <h1 id="mainTitle"></h1>
+    <p id="mainParagraph"></p>
+
+    <div class="language-selectors">
+        <label id="transcribeLangLabel" for="transcribeLang"></label>
+        <select id="transcribeLang">
+            <option value="en-US">English (en-US)</option>
+            <option value="hi-IN">Hindi (hi-IN)</option>
+            <option value="ta-IN">Tamil (ta-IN)</option>
+            <option value="ml-IN">Malayalam (ml-IN)</option>
+        </select>
+    </div>
+    
+    <div class="controls">
+        <button id="startBtn"></button>
+        <button id="stopBtn" disabled></button>
+        <button id="clearBtn"></button>
+        <button id="readAloudBtn"></button>
+    </div>
+    
+    <div class="output-container">
+        <div id="output" contenteditable="true"></div>
+        <div id="translatedOutput" style="display:none;"></div>
+    </div>
+
+    <div id="statusMessage"></div>
+    
+    <div class="controls">
+        <button id="downloadBtn"></button>
+        <button id="downloadPdfBtn"></button>
+        <button id="copyBtn"></button>
+        <button id="historyBtn"></button>
+    </div>
+
+    <div id="historySidebar" class="sidebar">
+        <button class="close-btn" id="closeSidebarBtn">&times;</button>
+        <h2 id="historyTitle"></h2>
+        <ul id="historyList"></ul>
+    </div>
+
+    <script>
+        window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        const translations = {
+            'ta': {
+                'mainTitle': 'தமிழ் மொழிபெயர்ப்பாளர்',
+                'mainParagraph': '"தொடங்கு" பொத்தானை அழுத்திப் பேசவும். உங்கள் பேச்சு உரையாக மாற்றப்பட்டு, பின்னர் தமிழாக்கம் செய்யப்படும்.',
+                'transcribeLangLabel': '🗣️ பேசும் மொழி:',
+                'startBtn': '▶️ தொடங்கு',
+                'stopBtn': '⏹️ நிறுத்து',
+                'clearBtn': '🧹 அழி',
+                'readAloudBtn': '🔊 தமிழாக்கத்தை வாசிக்கவும்',
+                'downloadBtn': '📝 உரையாகப் பதிவிறக்கு (.doc)',
+                'downloadPdfBtn': '📥 உரையாகப் பதிவிறக்கு (.pdf)',
+                'copyBtn': '📋 உரையை நகலெடு',
+                'historyBtn': '📜 முந்தைய உரைகள்',
+                'historyTitle': 'முந்தைய உரைகள்',
+                'outputDefault': 'உங்கள் பேச்சு இங்கே உரையாகத் தோன்றும்...',
+                'statusListening': '🎙️ கேட்டுக்கொண்டிருக்கிறது...',
+                'statusStopped': '🛑 நிறுத்திவிட்டது.',
+                'statusTranslating': '🌐 மொழிபெயர்க்கிறது...',
+                'statusError': '❌ மொழிபெயர்ப்பு சேவையில் பிழை ஏற்பட்டது.',
+                'statusNotSupported': '❌ உங்கள் உலாவியில் பேச்சு அங்கீகாரம் ஆதரிக்கப்படவில்லை.',
+                'statusBrowserRec': 'Chrome, Edge, அல்லது Firefox-ஐப் பயன்படுத்தவும்.',
+                'historyEmpty': 'வரலாறு இல்லை.',
+                'alertNoTextToRead': 'வாசிக்க எந்த உரையும் இல்லை!',
+                'alertLangNotSupported': 'தேர்ந்தெடுக்கப்பட்ட மொழி (ta-IN) உரையாக வாசிப்பதற்கு இந்த உலாவியில் ஆதரிக்கப்படவில்லை. வேறு மொழியை முயற்சிக்கவும்.',
+                'alertNoTextToDownload': 'பதிவிறக்க எந்த உரையும் இல்லை!',
+                'alertCopiedSuccess': 'உரை வெற்றிகரமாக நகலெடுக்கப்பட்டது!',
+                'alertCopyFailed': 'உரையை நகலெடுக்க முடியவில்லை: '
+            },
+            'en': {
+                'mainTitle': 'Tamil Translator',
+                'mainParagraph': 'Press the "Start" button and speak. Your speech will be converted to text and then translated into Tamil.',
+                'transcribeLangLabel': '🗣️ Spoken Language:',
+                'startBtn': '▶️ Start',
+                'stopBtn': '⏹️ Stop',
+                'clearBtn': '🧹 Clear',
+                'readAloudBtn': '🔊 Read Aloud Translation',
+                'downloadBtn': '📝 Download as Text (.doc)',
+                'downloadPdfBtn': '📥 Download as PDF (.pdf)',
+                'copyBtn': '📋 Copy Text',
+                'historyBtn': '📜 History',
+                'historyTitle': 'Previous Transcriptions',
+                'outputDefault': 'Your speech will appear here...',
+                'statusListening': '🎙️ Listening...',
+                'statusStopped': '🛑 Stopped.',
+                'statusTranslating': '🌐 Translating...',
+                'statusError': '❌ An error occurred with the translation service.',
+                'statusNotSupported': '❌ Speech recognition is not supported in your browser.',
+                'statusBrowserRec': 'Please use Chrome, Edge, or Firefox.',
+                'historyEmpty': 'No history.',
+                'alertNoTextToRead': 'There is no text to read!',
+                'alertLangNotSupported': 'Selected language (ta-IN) is not supported for text-to-speech in this browser. Please try another language.',
+                'alertNoTextToDownload': 'There is no text to download!',
+                'alertCopiedSuccess': 'Text successfully copied!',
+                'alertCopyFailed': 'Failed to copy text: '
+            }
+        };
+
+        const outputDiv = document.getElementById("output");
+        const translatedOutputDiv = document.getElementById("translatedOutput");
+        const startBtn = document.getElementById("startBtn");
+        const stopBtn = document.getElementById("stopBtn");
+        const clearBtn = document.getElementById("clearBtn");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const copyBtn = document.getElementById("copyBtn");
+        const statusMessage = document.getElementById("statusMessage");
+        const historyBtn = document.getElementById("historyBtn");
+        const historySidebar = document.getElementById("historySidebar");
+        const closeSidebarBtn = document.getElementById("closeSidebarBtn");
+        const historyList = document.getElementById("historyList");
+        const readAloudBtn = document.getElementById("readAloudBtn"); 
+        const downloadPdfBtn = document.getElementById("downloadPdfBtn");
+        const transcribeLangSelect = document.getElementById("transcribeLang");
+        const languageToggleBtn = document.getElementById("languageToggleBtn");
+        const mainTitle = document.getElementById("mainTitle");
+        const mainParagraph = document.getElementById("mainParagraph");
+        const transcribeLangLabel = document.getElementById("transcribeLangLabel");
+        const historyTitle = document.getElementById("historyTitle");
+
+        let currentLang = 'ta';
+        let finalTranscript = '';
+        let translatedText = '';
+        let isManualStop = false;
+        let history = [];
+        let availableVoices = [];
+
+        const loadVoices = () => {
+            availableVoices = window.speechSynthesis.getVoices();
+            console.log("Available voices loaded for Text-to-Speech.");
+        };
+
+        if (window.speechSynthesis) {
+            loadVoices();
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        } else {
+            readAloudBtn.disabled = true;
+        }
+        
+        const switchLanguage = (lang) => {
+            currentLang = lang;
+            const t = translations[lang];
+            
+            languageToggleBtn.textContent = lang === 'ta' ? 'English' : 'தமிழ்';
+            mainTitle.textContent = t.mainTitle;
+            mainParagraph.textContent = t.mainParagraph;
+            transcribeLangLabel.textContent = t.transcribeLangLabel;
+            startBtn.textContent = t.startBtn;
+            stopBtn.textContent = t.stopBtn;
+            clearBtn.textContent = t.clearBtn;
+            readAloudBtn.textContent = t.readAloudBtn;
+            downloadBtn.textContent = t.downloadBtn;
+            downloadPdfBtn.textContent = t.downloadPdfBtn;
+            copyBtn.textContent = t.copyBtn;
+            historyBtn.textContent = t.historyBtn;
+            historyTitle.textContent = t.historyTitle;
+            outputDiv.textContent = t.outputDefault;
+            
+            renderHistory();
+        };
+
+        const renderHistory = () => {
+            const t = translations[currentLang];
+            historyList.innerHTML = '';
+            if (history.length === 0) {
+                historyList.innerHTML = `<li>${t.historyEmpty}</li>`;
+                return;
+            }
+            history.forEach((text, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'history-item';
+                
+                const textDiv = document.createElement('div');
+                textDiv.className = 'history-text';
+                textDiv.textContent = text.length > 50 ? text.substring(0, 50) + '...' : text;
+                textDiv.onclick = () => {
+                    outputDiv.textContent = text;
+                    finalTranscript = text;
+                    historySidebar.classList.remove('open');
+                };
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.textContent = '❌';
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    history.splice(index, 1);
+                    renderHistory();
+                };
+                
+                listItem.appendChild(textDiv);
+                listItem.appendChild(removeBtn);
+                historyList.appendChild(listItem);
+            });
+        };
+
+        const addToHistory = (text) => {
+            if (text && text.trim().length > 0) {
+                history.unshift(text.trim());
+                if (history.length > 5) {
+                    history.pop();
+                }
+            }
+            renderHistory();
+        };
+        
+        const toggleSidebar = () => {
+            historySidebar.classList.toggle('open');
+        };
+
+        const translateText = async (text, sourceLang) => {
+            if (!text || text.trim().length === 0) return;
+            const t = translations[currentLang];
+            const targetLang = 'ta';
+            statusMessage.textContent = t.statusTranslating;
+            try {
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|${targetLang}`);
+                const data = await res.json();
+                if (data.responseData && data.responseData.translatedText) {
+                    translatedText = data.responseData.translatedText;
+                    translatedOutputDiv.innerHTML = `**${translations[currentLang].readAloudBtn.replace('🔊 ', '').replace('Translation', '')}:**<br>${translatedText}`;
+                    translatedOutputDiv.style.display = 'block';
+                } else {
+                    translatedText = 'Translation not available.';
+                    translatedOutputDiv.innerHTML = `**${translations[currentLang].readAloudBtn.replace('🔊 ', '').replace('Translation', '')}:**<br>${translatedText}`;
+                    translatedOutputDiv.style.display = 'block';
+                }
+            } catch (error) {
+                statusMessage.textContent = t.statusError;
+                console.error("Translation error:", error);
+            }
+            statusMessage.textContent = '';
+        };
+
+        if (!window.SpeechRecognition) {
+            const t = translations[currentLang];
+            outputDiv.textContent = t.statusNotSupported;
+            statusMessage.textContent = t.statusBrowserRec;
+        } else {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            recognition.onstart = () => {
+                statusMessage.textContent = translations[currentLang].statusListening;
+                outputDiv.classList.add('listening');
+            };
+
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript + ' ';
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+                outputDiv.textContent = finalTranscript + interimTranscript;
+            };
+
+            recognition.onerror = (e) => {
+                statusMessage.textContent = "Error: " + e.error;
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                outputDiv.classList.remove('listening');
+            };
+
+            recognition.onend = () => {
+                if (!isManualStop) {
+                    setTimeout(() => {
+                        recognition.start();
+                    }, 500); 
+                } else {
+                    addToHistory(finalTranscript);
+                    statusMessage.textContent = translations[currentLang].statusStopped;
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    outputDiv.classList.remove('listening');
+                    translateText(finalTranscript, transcribeLangSelect.value);
+                }
+            };
+
+            startBtn.onclick = () => {
+                isManualStop = false;
+                finalTranscript = '';
+                translatedText = '';
+                outputDiv.textContent = "";
+                translatedOutputDiv.textContent = "";
+                translatedOutputDiv.style.display = 'none';
+
+                const lang = transcribeLangSelect.value;
+                recognition.lang = lang;
+                recognition.start();
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+            };
+            
+            stopBtn.onclick = () => {
+                isManualStop = true;
+                recognition.stop();
+            };
+
+            clearBtn.onclick = () => {
+                isManualStop = true;
+                recognition.stop();
+                finalTranscript = '';
+                translatedText = '';
+                outputDiv.textContent = translations[currentLang].outputDefault;
+                translatedOutputDiv.textContent = "";
+                translatedOutputDiv.style.display = 'none';
+                statusMessage.textContent = "";
+                outputDiv.classList.remove('listening');
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            };
+            
+            historyBtn.onclick = toggleSidebar;
+            closeSidebarBtn.onclick = toggleSidebar;
+            
+            readAloudBtn.onclick = () => {
+                const text = translatedOutputDiv.textContent.replace(`**${translations[currentLang].readAloudBtn.replace('🔊 ', '').replace('Translation', '')}:**`, '').trim();
+                if (text.length === 0 || text === translations[currentLang].outputDefault) {
+                    alert(translations[currentLang].alertNoTextToRead);
+                    return;
+                }
+                
+                const voice = availableVoices.find(v => v.lang === 'ta-IN');
+
+                if (voice) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.voice = voice;
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    alert(translations[currentLang].alertLangNotSupported);
+                }
+            };
+
+            downloadBtn.onclick = () => {
+                const t = translations[currentLang];
+                const text = `Original Text:\n${outputDiv.textContent.trim()}\n\nTranslated Text:\n${translatedOutputDiv.textContent.trim().replace(`**${t.readAloudBtn.replace('🔊 ', '').replace('Translation', '')}:**`, '')}`;
+                if (outputDiv.textContent.trim().length === 0 || outputDiv.textContent.trim() === t.outputDefault) {
+                    alert(t.alertNoTextToDownload);
+                    return;
+                }
+                const blob = new Blob([text], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'speech_transcript.doc';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+
+            downloadPdfBtn.onclick = () => {
+                const t = translations[currentLang];
+                const textContainer = document.createElement('div');
+                textContainer.innerHTML = `<div>Original Text:<br>${outputDiv.textContent.trim()}</div><div style="margin-top: 20px;">Translated Text:<br>${translatedOutputDiv.textContent.trim().replace(`**${t.readAloudBtn.replace('🔊 ', '').replace('Translation', '')}:**`, '')}</div>`;
+                document.body.appendChild(textContainer);
+
+                html2canvas(textContainer, {
+                    scale: 2,
+                    useCORS: true
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF('p', 'mm', 'a4');
+                    const imgWidth = 210;
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+
+                    doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                    doc.save('தமிழ்_மொழிபெயர்ப்பு.pdf');
+                    document.body.removeChild(textContainer);
+                });
+            };
+
+            copyBtn.onclick = () => {
+                const t = translations[currentLang];
+                const text = `Original: ${outputDiv.textContent.trim()}\n\nTranslated: ${translatedOutputDiv.textContent.trim().replace(`**${t.readAloudBtn.replace('🔊 ', '').replace('Translation', '')}:**`, '')}`;
+                if (outputDiv.textContent.trim().length === 0 || outputDiv.textContent.trim() === t.outputDefault) {
+                    alert(t.alertNoTextToDownload);
+                    return;
+                }
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        alert(t.alertCopiedSuccess);
+                    })
+                    .catch(err => {
+                        alert(t.alertCopyFailed + err);
+                    });
+            };
+            
+            languageToggleBtn.onclick = () => {
+                const newLang = currentLang === 'ta' ? 'en' : 'ta';
+                switchLanguage(newLang);
+            };
+
+            // Set initial language on page load
+            document.addEventListener('DOMContentLoaded', () => {
+                switchLanguage('ta');
+            });
+            
+        }
+    </script>
+</body>
+</html>
